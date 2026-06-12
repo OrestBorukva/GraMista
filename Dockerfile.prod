@@ -1,0 +1,29 @@
+# Прод-образ GraMista: збірка і запуск Next у контейнері.
+# Білд не ходить у БД (усі сторінки динамічні) — ARG-заглушки потрібні лише,
+# щоб ініціалізація модулів (Prisma/Better Auth) не падала на відсутніх env.
+FROM node:22-bookworm-slim
+
+# openssl потрібен рушієві Prisma
+RUN apt-get update && apt-get install -y --no-install-recommends openssl \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Спершу лише маніфести — кешуємо шар із залежностями
+COPY package.json package-lock.json ./
+RUN npm ci
+
+COPY prisma ./prisma
+RUN npx prisma generate
+
+COPY . .
+
+ARG DATABASE_URL="postgresql://build:build@localhost:5432/build?schema=public"
+ARG BETTER_AUTH_SECRET="build-time-dummy"
+ARG BETTER_AUTH_URL="http://localhost:3000"
+ARG APP_BASE_URL="http://localhost:3000"
+RUN npx next build
+
+ENV NODE_ENV=production
+EXPOSE 3000
+CMD ["npx", "next", "start", "-H", "0.0.0.0", "-p", "3000"]

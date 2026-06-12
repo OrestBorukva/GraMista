@@ -1,0 +1,200 @@
+/* Публічна сторінка /<handle>: повноекранна мапа + плаваючі панелі (мокап public-live-v3). */
+.pub-root { position: fixed; inset: 0; overflow: hidden; }
+.pub-map { position: absolute; inset: 0; }
+.pub-map .map-canvas { height: 100vh; }
+
+.pub-panel {
+  position: fixed; background: rgba(36, 30, 25, .84); backdrop-filter: blur(10px);
+  border: 1px solid var(--line-soft); border-radius: var(--radius);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, .35); z-index: 9;
+}
+
+/* Шапка */
+.pub-hdr { top: 16px; left: 16px; display: flex; align-items: center; gap: 13px; padding: 11px 16px 11px 11px; z-index: 10; }
+.pub-ava {
+  width: 46px; height: 46px; border-radius: 50%; flex: none;
+  background: linear-gradient(135deg, var(--accent), var(--gold));
+  display: grid; place-items: center; font: 800 20px Manrope, sans-serif; color: #241505;
+}
+.pub-hname { font: 800 18px Manrope, sans-serif; }
+.pub-hsub { font: 500 12.5px Onest, sans-serif; color: var(--ink-3); margin-top: 1px; display: flex; gap: 7px; align-items: center; }
+.pub-hsub b { color: var(--danger); font: 700 12.5px Manrope, sans-serif; }
+.pub-live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--danger); animation: pub-pulse 1.6s infinite; }
+@keyframes pub-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(224, 107, 87, .5); } 50% { box-shadow: 0 0 0 6px rgba(224, 107, 87, 0); } }
+.pub-hbtns { display: flex; gap: 8px; margin-left: 8px; flex-wrap: wrap; }
+.pub-hbtn {
+  display: flex; align-items: center; gap: 6px; padding: 8px 13px; border-radius: 999px;
+  border: 1px solid var(--line); background: none; color: var(--ink-2); text-decoration: none;
+  font: 600 12.5px Onest, sans-serif; cursor: pointer; transition: .15s;
+}
+.pub-hbtn:hover { border-color: var(--accent); color: var(--ink); }
+.pub-hbtn.watch { border-color: rgba(224, 107, 87, .55); color: var(--ink); }
+
+/* «Як це працює» */
+.pub-howto { top: 88px; left: 16px; display: flex; gap: 14px; align-items: center; padding: 10px 16px; font: 500 13px Onest, sans-serif; color: var(--ink-2); }
+.pub-howto .n {
+  width: 20px; height: 20px; border-radius: 50%; background: var(--card-2); border: 1px solid var(--line);
+  display: inline-grid; place-items: center; font: 800 11px Manrope, sans-serif; color: var(--gold); margin-right: 6px;
+}
+.pub-howto b { color: var(--ink); }
+.pub-howto .x { margin-left: 4px; background: none; border: 0; color: var(--ink-3); cursor: pointer; font-size: 15px; }
+
+/* Битва за перше (T8) */
+.pub-battle {
+  top: 16px; left: 50%; transform: translateX(-50%); padding: 11px 22px;
+  font: 700 15px Onest, sans-serif; white-space: nowrap; border-color: rgba(224, 182, 107, .4); z-index: 8;
+  animation: pub-bpop .6s ease;
+}
+.pub-battle b { color: var(--gold); font: 800 15px Manrope, sans-serif; }
+@keyframes pub-bpop { 30% { transform: translateX(-50%) scale(1.06); } }
+
+/* Топ міст */
+.pub-top { left: 16px; top: 150px; width: 268px; padding: 14px 14px 10px; }
+.pub-ptitle {
+  font: 700 13px Onest, sans-serif; color: var(--ink-3); text-transform: uppercase; letter-spacing: .08em;
+  margin: 0 4px 10px; display: flex; justify-content: space-between; align-items: center;
+}
+.pub-trow { display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-radius: var(--radius-sm); transition: background .3s; cursor: pointer; }
+.pub-trow:hover { background: var(--card-2); }
+.pub-trow .medal { width: 22px; text-align: center; font-size: 15px; flex: none; }
+.pub-trow .nm { flex: 1; font: 600 14px Onest, sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.pub-trow .pts { font: 800 13.5px Manrope, sans-serif; color: var(--accent-soft); flex: none; }
+.pub-toplist { overflow-y: auto; max-height: calc(100vh - 480px); }
+.pub-toplist::-webkit-scrollbar { width: 8px; }
+.pub-toplist::-webkit-scrollbar-thumb { background: var(--line); border-radius: 99px; }
+.pub-texpand { display: block; width: 100%; text-align: center; font: 600 12px Onest, sans-serif; color: var(--ink-3); padding: 7px 0 2px; cursor: pointer; background: none; border: 0; }
+.pub-texpand:hover { color: var(--accent-soft); }
+.pub-tfoot { display: flex; gap: 6px; padding: 8px 2px 4px; }
+.pub-tfoot button {
+  flex: 1; text-align: center; font: 600 12.5px Onest, sans-serif; color: var(--ink-3); background: none;
+  padding: 7px 4px; border: 1px solid var(--line-soft); border-radius: 999px; cursor: pointer; transition: .15s;
+}
+.pub-tfoot button:hover { color: var(--accent-soft); border-color: var(--accent); }
+
+/* Пошук свого міста (T6) */
+.pub-seek { margin-top: 8px; padding: 0 2px; }
+.pub-seek input {
+  width: 100%; padding: 9px 12px; border-radius: 999px; border: 1px solid var(--line);
+  background: var(--card-2); color: var(--ink); font: 500 13px Onest, sans-serif; outline: none;
+}
+.pub-seek input:focus { border-color: var(--accent); }
+.pub-seek .res { font: 500 12.5px Onest, sans-serif; color: var(--ink-2); padding: 8px 6px 2px; min-height: 20px; }
+.pub-seek .res b { color: var(--gold); }
+.pub-seek .res .first { color: var(--accent-soft); font-weight: 700; }
+
+/* Стрічка донатів */
+.pub-feed { right: 16px; top: 88px; width: 286px; padding: 14px 14px 8px; }
+.pub-frow { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; padding: 7px 8px; border-radius: var(--radius-sm); }
+.pub-frow .who { font: 600 13.5px Onest, sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pub-frow .cty { font: 500 12px Onest, sans-serif; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 40%; }
+.pub-frow .amt { font: 800 13.5px Manrope, sans-serif; color: var(--gold); margin-left: auto; flex: none; }
+.pub-frow.new { animation: pub-slidein .5s ease; background: rgba(224, 182, 107, .12); }
+@keyframes pub-slidein { from { opacity: 0; translate: 24px 0; } to { opacity: 1; translate: 0 0; } }
+.pub-frow.biggest .who::before { content: "🔥 "; }
+.pub-frow.opener { background: rgba(224, 182, 107, .10); }
+.pub-frow .ncty {
+  flex: none; font: 700 10.5px Onest, sans-serif; color: #241E19;
+  background: linear-gradient(180deg, var(--gold), var(--accent)); border-radius: 999px;
+  padding: 2px 8px; white-space: nowrap;
+}
+/* Коментар донату в публічній стрічці (тумблер showCommentPublic у Налаштуваннях) — другим рядком. */
+.pub-frow .fmsg { flex-basis: 100%; font: 500 12px Onest, sans-serif; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pub-empty { font: 500 13px Onest, sans-serif; color: var(--ink-3); padding: 8px; }
+
+/* Плитки дня */
+.pub-tiles { left: 16px; bottom: 16px; display: flex; gap: 10px; padding: 10px; }
+.pub-tile { padding: 9px 14px; border-radius: var(--radius-sm); background: var(--card-2); border: 1px solid var(--line-soft); min-width: 118px; }
+.pub-tile .l { font: 600 10.5px Onest, sans-serif; color: var(--ink-3); text-transform: uppercase; letter-spacing: .06em; }
+.pub-tile .v { font: 800 16px Manrope, sans-serif; color: var(--ink); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; }
+
+/* Низ: збір + зібрано + донат CTA + QR */
+.pub-foot { left: 50%; transform: translateX(-50%); bottom: 16px; display: flex; align-items: center; gap: 20px; padding: 13px 20px; max-width: min(900px, calc(100vw - 32px)); }
+.pub-goal { min-width: 270px; }
+.pub-goal-top { display: flex; justify-content: space-between; gap: 14px; font: 600 12.5px Onest, sans-serif; color: var(--ink-2); margin-bottom: 7px; }
+.pub-goal-top b { color: var(--ink); font: 800 13px Manrope, sans-serif; white-space: nowrap; }
+.pub-bar { height: 10px; border-radius: 999px; background: var(--card-2); overflow: hidden; }
+.pub-bar i { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--accent-deep), var(--gold)); transition: width .8s ease; }
+.pub-raised { text-align: center; }
+.pub-raised .lbl { font: 600 11px Onest, sans-serif; color: var(--ink-3); text-transform: uppercase; letter-spacing: .07em; }
+.pub-raised .val { font: 800 21px Manrope, sans-serif; }
+.pub-don {
+  display: inline-block; padding: 13px 24px; border-radius: 999px; text-decoration: none;
+  background: linear-gradient(135deg, var(--accent), var(--gold)); color: #241505;
+  font: 800 15.5px Manrope, sans-serif; box-shadow: 0 10px 30px rgba(208, 135, 90, .35);
+  transition: .15s; white-space: nowrap;
+}
+.pub-don:hover { transform: translateY(-2px); }
+.pub-qr { width: 68px; height: 68px; border-radius: 10px; background: #F3E9DF; padding: 5px; flex: none; }
+.pub-qr svg { width: 100%; height: 100%; display: block; }
+
+/* Картка міста (T7) */
+.pub-citycard { right: 16px; bottom: 16px; width: 286px; padding: 16px; z-index: 11; animation: pub-slidein .35s ease; }
+.pub-citycard h3 { margin: 0 0 2px; font: 800 18px Manrope, sans-serif; overflow-wrap: anywhere; padding-right: 18px; }
+.pub-citycard .place { font: 600 12.5px Onest, sans-serif; color: var(--ink-3); margin-bottom: 10px; }
+.pub-citycard .cdon { display: flex; gap: 8px; font: 500 12.5px Onest, sans-serif; color: var(--ink-2); padding: 4px 0; }
+.pub-citycard .cdon .a { margin-left: auto; color: var(--gold); font: 700 12.5px Manrope, sans-serif; }
+.pub-citycard .pub-don { display: block; text-align: center; margin-top: 12px; padding: 11px 18px; font-size: 14px; white-space: normal; }
+.pub-citycard .x { position: absolute; top: 10px; right: 14px; background: none; border: 0; color: var(--ink-3); cursor: pointer; font-size: 16px; }
+
+/* Стріми (T11) */
+.pub-streams { top: 88px; right: 318px; width: 300px; padding: 14px; z-index: 12; animation: pub-slidein .3s ease; }
+.pub-srow { display: flex; gap: 8px; align-items: baseline; padding: 7px 6px; font: 500 13px Onest, sans-serif; color: var(--ink-2); }
+.pub-srow b { color: var(--ink); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pub-srow a { margin-left: auto; color: var(--accent-soft); text-decoration: none; font-weight: 700; flex: none; }
+
+/* Гонка міст (T10) */
+.pub-race-bg { position: fixed; inset: 0; background: rgba(20, 16, 13, .7); backdrop-filter: blur(4px); display: grid; place-items: center; z-index: 30; }
+.pub-race { width: min(640px, 92vw); padding: 22px 24px; position: relative; }
+.pub-race h3 { margin: 0 0 4px; font: 800 19px Manrope, sans-serif; }
+.pub-race .day { font: 600 13px Onest, sans-serif; color: var(--ink-3); margin-bottom: 14px; }
+.pub-rrow { display: flex; align-items: center; gap: 10px; margin: 9px 0; }
+.pub-rrow .nm { width: 152px; font: 600 13px Onest, sans-serif; text-align: right; flex: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pub-rrow .track { flex: 1; height: 22px; background: var(--card-2); border-radius: 999px; overflow: hidden; }
+.pub-rrow .fill {
+  height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--accent-deep), var(--gold));
+  transition: width .55s cubic-bezier(.3, .7, .3, 1); display: flex; align-items: center; justify-content: flex-end;
+  padding-right: 9px; font: 800 11.5px Manrope, sans-serif; color: #241505; min-width: 34px;
+}
+.pub-race .x { position: absolute; top: 14px; right: 18px; background: none; border: 0; color: var(--ink-3); cursor: pointer; font-size: 18px; }
+
+/* «Усі міста» (T6) — реюз каркаса race-модалки */
+.pub-all { width: min(440px, 92vw); max-height: 80vh; display: flex; flex-direction: column; padding: 22px 24px; position: relative; }
+.pub-all .list { overflow-y: auto; margin-top: 8px; }
+
+/* 404 */
+.pub-404 { min-height: 100vh; display: grid; place-content: center; text-align: center; gap: 8px; }
+
+/* Футер-бренд */
+.pub-brand { position: fixed; right: 16px; bottom: 16px; font: 600 11.5px Onest, sans-serif; color: var(--ink-3); z-index: 8; }
+.pub-brand a { color: var(--ink-2); text-decoration: none; }
+
+/* ── Мобільна розкладка (глядачі з чату — телефони): мапа зверху, панелі стопкою ── */
+@media (max-width: 980px) {
+  .pub-root { overflow-y: auto; overflow-x: hidden; }
+  .pub-map { position: relative; inset: auto; height: 55vh; }
+  .pub-map .map-canvas { height: 55vh; }
+  .pub-panel { position: static; transform: none; margin: 10px 10px 0; }
+  .pub-hdr { flex-wrap: wrap; }
+  .pub-hbtns { margin-left: 0; }
+  .pub-battle { white-space: normal; text-align: center; animation: none; }
+  .pub-top, .pub-feed { width: auto; }
+  .pub-toplist { max-height: none; overflow: visible; }
+  .pub-tiles { flex-wrap: wrap; }
+  .pub-tile { flex: 1 1 40%; min-width: 0; }
+  .pub-foot { max-width: none; flex-wrap: wrap; justify-content: center; }
+  .pub-goal { min-width: 100%; }
+  .pub-streams { position: static; width: auto; margin-top: 8px; }
+  /* Картка міста — поверх усього знизу (єдина, що лишається плаваючою). */
+  .pub-citycard { position: fixed; left: 10px; right: 10px; bottom: 10px; width: auto; margin: 0; }
+  .pub-brand { position: static; text-align: center; padding: 12px 0 16px; }
+}
+
+/* ── Архівна сторінка збору /<handle>/zbir/<id>: вузька колонка по центру, без мапи ── */
+.pub-archive { position: static; overflow: visible; max-width: 720px; margin: 0 auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.pub-archive .pub-panel { position: static; transform: none; width: auto; left: auto; top: auto; right: auto; bottom: auto; }
+.pub-archive .pub-hdr { padding: 11px 16px 11px 11px; }
+.pub-archive .pub-tiles { flex-wrap: wrap; }
+.pub-archive .pub-top { padding: 14px; }
+.pub-archive .pub-brand { position: static; text-align: center; padding: 12px 0; }
+.pub-arch-stream { font: 500 13px Onest, sans-serif; color: var(--ink-2); padding: 5px 0; }
+.pub-arch-stream a { margin-left: 8px; color: var(--accent); text-decoration: none; }

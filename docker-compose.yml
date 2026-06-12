@@ -1,0 +1,47 @@
+# Локальна БД для розробки (Крок 1 міграції). Запуск: docker compose up -d
+# Прод-БД — окремо (managed Postgres на хостингу); ці креди лише для локального dev.
+services:
+  db:
+    image: postgres:16
+    container_name: gramista-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: gramista
+      POSTGRES_PASSWORD: gramista
+      POSTGRES_DB: gramista
+    ports:
+      - "5435:5432"
+    volumes:
+      - gramista-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gramista -d gramista"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Веб-застосунок (табло, оверлеї, публічна сторінка) — Next dev на 3002.
+  app:
+    build: .
+    container_name: gramista-app
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      # Усередині мережі compose БД доступна як host `db`, порт 5432 (не 5435).
+      DATABASE_URL: "postgresql://gramista:gramista@db:5432/gramista?schema=public"
+      BETTER_AUTH_URL: "http://localhost:3002"
+      # Опитування файлів — bind-mount із Windows не шле inotify-події в Linux.
+      WATCHPACK_POLLING: "true"
+      CHOKIDAR_USEPOLLING: "true"
+    command: sh -c "npx prisma generate && npx next dev -H 0.0.0.0 -p 3002"
+    ports:
+      - "3002:3002"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+      - /app/node_modules   # Linux-залежності з образу, не з хоста
+      - /app/.next          # ізольований .next, щоб не битися з dev на хості
+
+volumes:
+  gramista-pgdata:

@@ -1,0 +1,336 @@
+// GraMista — модель даних (CONCEPT.md §14 + Settlement/Alias зі звіту по містах).
+// SSOT балів — журнал PointEvent; топи = агрегація журналу.
+// userId всюди — мультитенант (зараз один дефолтний користувач; реальний auth — Крок 8).
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [pg_trgm, unaccent]
+}
+
+enum DonationStatus {
+  recognized
+  unrecognized
+}
+
+enum PointSource {
+  donation
+  pool_flush
+  admin
+}
+
+model User {
+  id             String   @id @default(cuid())
+  email          String   @unique
+  name           String
+  emailVerified  Boolean  @default(false)
+  image          String?
+  // Глобальний тумблер «битва міст»: коли false — донати рахуються лише як гроші,
+  // міста балів не отримують (мапа/топ не чіпаються). Див. docs/specs/2026-06-07-money-and-cities.md.
+  cityBattle     Boolean  @default(true)
+  // Публічний слаг (адреса /<стрімер> §18). Capability-токен оверлеїв (як StreamElements).
+  handle         String?  @unique
+  overlayKey     String?  @unique
+  monobankJarUrl String?
+  twitchUrl      String?
+  youtubeUrl     String?
+  // Показувати «минулі стріми» на публічній сторінці /<handle> (§18; стрімер може сховати).
+  publicShowStreams Boolean @default(true)
+  // Роль рівня сервісу: 'user' | 'admin'. Призначається ТІЛЬКИ вручну в БД —
+  // жодного API зміни ролі (захист від самопідвищення). Див. спеку global-map §3.
+  role              String  @default("user")
+  // Участь у глобальній мапі /ukraine: рахувати донати в загальні агрегати й показувати
+  // стрімера в учасниках. Вимкнув — миттєво зникає (агрегація жива, лічильників-копій нема).
+  showOnGlobalMap   Boolean @default(true)
+  // Модерація адміном сервісу: сховати стрімера з /ukraine навіть якщо він сам увімкнув
+  // участь (виключає з усіх зрізів). Ставить лише адмін через /service.
+  hiddenFromGlobalMap Boolean @default(false)
+  // Показ коментаря донату глядачам: 'mask' (мат → зірочки) | 'replace' (→ [цензура])
+  // | 'city' (лише розпізнане місто) | 'hide' (не показувати). Текст чиститься в getState
+  // (lib/dashboard) — на оверлеї/публічну сирий мат не потрапляє; адмінська історія сира.
+  commentMode        String  @default("mask")
+  // Власні слова стрімера до базового списку цензора і винятки з нього (коми/нові рядки).
+  bannedWordsAdded   String  @default("")
+  bannedWordsAllowed String  @default("")
+  // Показувати коментарі донатів у стрічці публічної сторінки /<handle>.
+  showCommentPublic  Boolean @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  sessions     Session[]
+  accounts     Account[]
+  sources      DonationSource[]
+  donations    Donation[]
+  pools        DonorCityPool[]
+  pointEvents  PointEvent[]
+  streams      Stream[]
+  collections  Collection[]
+  adminActions AdminAction[]
+  // 2FA (плагін Better Auth twoFactor): чи увімкнено + таблиця секретів/backup-кодів.
+  twoFactorEnabled Boolean?    @default(false)
+  twoFactors       TwoFactor[]
+}
+
+// Таблиця плагіна Better Auth twoFactor (TOTP). Поля — за дефолтною схемою плагіна; назву
+// таблиці лишаємо PascalCase (як решта наших таблиць), мапінг назв Better Auth не потрібен.
+model TwoFactor {
+  id          String   @id @default(cuid())
+  secret      String
+  backupCodes String
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  verified    Boolean? @default(true)
+
+  @@index([secret])
+  @@index([userId])
+}
+
+// Таблиці Better Auth (керуються бібліотекою; назви полів — за її дефолтною схемою).
+model Session {
+  id        String   @id @default(cuid())
+  expiresAt DateTime
+  token     String   @unique
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String? // credential-пароль (scrypt) — тут, не на User
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+}
+
+// Підключене джерело донатів (monobank-вебхук на банку).
+model DonationSource {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type          String    @default("monobank")
+  monoAccountId String?
+  webhookSecret String?   @unique
+  title         String?
+  status        String    @default("active")
+  lastEventAt   DateTime?
+  createdAt     DateTime  @default(now())
+
+  donations Donation[]
+
+  @@index([userId])
+}
+
+// Глобальний довідник НП України.
+model Settlement {
+  id         String  @id @default(cuid())
+  katottg    String? @unique
+  name       String
+  nameNorm   String
+  type       String?
+  oblast     String?
+  raion      String?
+  hromada    String?
+  population Int?
+  lat        Float?
+  lon        Float?
+
+  aliases     SettlementAlias[]
+  donations   Donation[]
+  pools       DonorCityPool[]
+  pointEvents PointEvent[]
+
+  @@index([nameNorm])
+  @@index([nameNorm(ops: raw("gin_trgm_ops"))], type: Gin, map: "Settlement_nameNorm_trgm")
+}
+
+// Синоніми / відмінкові форми / транслітерація → settlement.
+model SettlementAlias {
+  id           String     @id @default(cuid())
+  settlementId String
+  settlement   Settlement @relation(fields: [settlementId], references: [id], onDelete: Cascade)
+  alias        String
+  aliasNorm    String
+  source       String? // 'declension' | 'translit' | 'manual' | ...
+
+  @@index([settlementId])
+  @@index([aliasNorm])
+  @@index([aliasNorm(ops: raw("gin_trgm_ops"))], type: Gin, map: "SettlementAlias_aliasNorm_trgm")
+}
+
+// Донат. donorName — повне ім'я (внутрішньо, для ключа скарбнички); назовні анонімізуємо.
+model Donation {
+  id            String          @id @default(cuid())
+  userId        String
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sourceId      String?
+  source        DonationSource? @relation(fields: [sourceId], references: [id], onDelete: SetNull)
+  externalId    String // = Дяка data-key (дедуп)
+  donorName     String
+  amount        Decimal         @db.Decimal(12, 2) // гривні
+  message       String
+  settlementId  String?
+  settlement    Settlement?     @relation(fields: [settlementId], references: [id], onDelete: SetNull)
+  streamId      String?
+  stream        Stream?         @relation(fields: [streamId], references: [id], onDelete: SetNull)
+  collectionId  String?
+  collection    Collection?     @relation(fields: [collectionId], references: [id], onDelete: SetNull)
+  status        DonationStatus  @default(unrecognized)
+  pointsAwarded Decimal         @default(0) @db.Decimal(14, 4)
+  createdAt     DateTime        @default(now()) // час донату
+
+  pointEvents PointEvent[]
+
+  @@unique([userId, externalId])
+  @@index([userId, createdAt(sort: Desc), id(sort: Desc)])
+  @@index([userId, amount])
+  @@index([userId, status])
+  @@index([userId, settlementId])
+  @@index([userId, streamId])
+  @@index([userId, collectionId])
+  @@index([donorName(ops: raw("gin_trgm_ops"))], type: Gin)
+}
+
+// Скарбничка малих донатів за трійкою (донатер, місто, збір). Живе всередині збору, тому
+// Cascade: видалив збір → його недозбирані залишки зникають (донати/бали при цьому SetNull
+// і лишаються в історії). Унікальність — частковими індексами (nullable collectionId не
+// тримається у звичайному унікальному ключі Postgres), див. migration.sql.
+model DonorCityPool {
+  id                String      @id @default(cuid())
+  userId            String
+  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  donorKey          String
+  settlementId      String
+  settlement        Settlement  @relation(fields: [settlementId], references: [id], onDelete: Cascade)
+  collectionId      String?
+  collection        Collection? @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  accumulatedAmount Decimal     @default(0) @db.Decimal(12, 2)
+
+  @@index([userId, settlementId])
+  @@index([userId, collectionId, donorKey, settlementId])
+}
+
+// Журнал балів — єдине джерело істини. Топи = SUM(points) у вікні/за стрімом.
+model PointEvent {
+  id           String      @id @default(cuid())
+  userId       String
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  settlementId String
+  settlement   Settlement  @relation(fields: [settlementId], references: [id], onDelete: Cascade)
+  points       Decimal     @db.Decimal(14, 4)
+  source       PointSource
+  donationId   String?
+  donation     Donation?   @relation(fields: [donationId], references: [id], onDelete: SetNull)
+  streamId     String?
+  stream       Stream?     @relation(fields: [streamId], references: [id], onDelete: SetNull)
+  collectionId String?
+  collection   Collection? @relation(fields: [collectionId], references: [id], onDelete: SetNull)
+  createdAt    DateTime    @default(now())
+
+  @@index([userId, createdAt])
+  @@index([userId, settlementId])
+  @@index([userId, streamId])
+  @@index([userId, collectionId])
+}
+
+// Сесія ефіру.
+model Stream {
+  id           String      @id @default(cuid())
+  userId       String
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name         String
+  url          String? // посилання на VOD/трансляцію (Twitch/YouTube) — §17.3, публічна сторінка §18
+  notes        String? // приватні нотатки оператора про стрім — §17.3
+  startedAt    DateTime
+  endedAt      DateTime?
+  collectionId String?
+  collection   Collection? @relation(fields: [collectionId], references: [id], onDelete: SetNull)
+  createdAt    DateTime    @default(now())
+
+  donations   Donation[]
+  pointEvents PointEvent[]
+
+  @@index([userId, startedAt])
+  @@index([collectionId])
+}
+
+// Журнал дій оператора в Адмінці (§17.5): аудит + відкат ОБОРОТНИХ дій. Скидання балів
+// (resetCity/resetAll) логуються, але незворотні (undoable=false) — знищують дані.
+model AdminAction {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // 'assignCity' | 'reassignCity' | 'assignCityBulk' | 'adjustPoints' | 'addAlias' | 'resetCity' | 'resetAll'
+  type      String
+  summary   String // людський опис дії (укр.) — для журналу в UI
+  payload   Json // дані для відкату (специфічні для типу)
+  undoable  Boolean   @default(true) // чи підтримує відкат
+  undoneAt  DateTime? // коли відкочено (null — активна)
+  createdAt DateTime  @default(now())
+
+  @@index([userId, createdAt])
+}
+
+// Збір — серія змагання: рамка топу міст, що охоплює кілька стрімів. Ціль-сума необов'язкова.
+// Статуси active/paused/completed; активний — щонайбільше один (частковий унікальний індекс
+// у migration.sql). Див. docs/specs/2026-06-10-collections-as-seasons.md.
+model Collection {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  goalUah   Decimal?  @db.Decimal(12, 2)
+  startAt   DateTime  @default(now())
+  endAt     DateTime?
+  status    String    @default("active")
+  createdAt DateTime  @default(now())
+
+  streams     Stream[]
+  donations   Donation[]
+  pointEvents PointEvent[]
+  pools       DonorCityPool[]
+  appSettings AppSetting[]
+
+  @@index([userId])
+}
+
+// Налаштування рівня сервісу — рівно ОДИН рядок (id фіксований 'app').
+// Зараз тут лише «збір у фокусі» для /ukraine; майбутні глобальні налаштування — сюди ж.
+model AppSetting {
+  id                   String      @id @default("app")
+  featuredCollectionId String?
+  featuredCollection   Collection? @relation(fields: [featuredCollectionId], references: [id], onDelete: SetNull)
+  updatedAt            DateTime    @updatedAt
+}

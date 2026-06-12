@@ -1,0 +1,49 @@
+{
+  "name": "gramista",
+  "version": "0.1.0",
+  "license": "PolyForm-Noncommercial-1.0.0",
+  "author": "Orest Borukva (https://t.me/OrestBorykva)",
+  "private": true,
+  "type": "module",
+  "description": "Гейміфікація донатів через змагання міст України (джерело — monobank)",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "typecheck:test": "tsc -p tsconfig.test.json --noEmit",
+    "test": "tsx test/run.ts",
+    "db:seed": "prisma db seed",
+    "db:demo": "tsx prisma/demo-seed.ts",
+    "db:import": "tsx prisma/import-settlements.ts",
+    "db:test:setup": "tsx prisma/setup-test-db.ts"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.3",
+    "better-auth": "^1.6.15",
+    "canvas-confetti": "^1.9.4",
+    "dotenv": "^16.4.5",
+    "maplibre-gl": "^5.24.0",
+    "next": "^15.5.19",
+    "pg": "^8.21.0",
+    "qrcode": "^1.5.4",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/canvas-confetti": "^1.9.0",
+    "@types/node": "^22.10.0",
+    "@types/pg": "^8.20.0",
+    "@types/qrcode": "^1.5.6",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "csv-parse": "^6.2.1",
+    "prisma": "^6.19.3",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

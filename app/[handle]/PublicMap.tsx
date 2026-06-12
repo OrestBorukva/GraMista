@@ -1,0 +1,10 @@
+'use client';
+
+import { MapUkraine } from '@/app/MapUkraine';
+import type { MapPoint } from '@/lib/map';
+import { openCity } from './TopCities';
+
+// Мапа публічної сторінки: той самий MapUkraine, клік на місто → подія картки (gramista:city).
+export function PublicMap({ points }: { points: MapPoint[] }) {
+  return <MapUkraine points={points} showControls={false} initialLabels="all" onCitySelect={openCity} />;
+}

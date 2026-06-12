@@ -1,0 +1,178 @@
+/* Глобальна мапа /ukraine — порт погодженого мокапа (ukraine-mockup.html). Префікс ukr-,
+   щоб не колізнути з globals.css/public.css. Реальну мапу й «спалахи» малює MapUkraine —
+   SVG-стилі фейкової мапи з мокапа сюди НЕ переносимо. */
+
+.ukr-root {
+  --u-card-2: #2B231D;
+  --u-line-soft: #332921;
+  --u-ink-2: #CDBCAB;
+  --u-ink-3: #9A8979;
+  --u-accent: #D0875A;
+  --u-accent-soft: #E2A878;
+  --u-accent-deep: #B66E43;
+  --u-gold: #E0B66B;
+  --u-danger: #E06B57;
+  --u-radius: 18px;
+  --u-radius-sm: 12px;
+
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  color: #F3E9DF;
+  font-family: "Onest", "Manrope", system-ui, sans-serif;
+  background:
+    radial-gradient(1100px 520px at 78% -8%, rgba(208, 135, 90, .10), transparent 60%),
+    radial-gradient(900px 480px at 8% 110%, rgba(140, 154, 107, .07), transparent 55%),
+    #1B1714;
+}
+
+.ukr-map { position: fixed; inset: 0; }
+.ukr-map > * { width: 100%; height: 100%; }
+
+.ukr-panel {
+  position: fixed;
+  background: rgba(36, 30, 25, .84);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--u-line-soft);
+  border-radius: var(--u-radius);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, .35);
+}
+
+/* ── Шапка-бренд (сторінка СЕРВІСУ, не стрімера) ── */
+.ukr-hdr { top: 16px; left: 16px; display: flex; align-items: center; gap: 12px; padding: 11px 18px 11px 11px; z-index: 10; }
+.ukr-brand-mark {
+  width: 42px; height: 42px; border-radius: 13px; display: grid; place-items: center; font-size: 21px;
+  background: linear-gradient(150deg, var(--u-accent-soft), var(--u-accent-deep));
+  box-shadow: 0 6px 18px rgba(182, 110, 67, .35), inset 0 1px 0 rgba(255, 255, 255, .25);
+}
+.ukr-brand-name { font: 800 19px Manrope; letter-spacing: .2px; }
+.ukr-brand-name span { color: var(--u-accent-soft); }
+.ukr-brand-sub { font: 500 12px Onest; color: var(--u-ink-3); margin-top: 1px; }
+
+/* ── Герой: два головні числа ── */
+.ukr-hero { top: 16px; left: 50%; transform: translateX(-50%); text-align: center; padding: 13px 34px 14px; z-index: 9; border-color: rgba(224, 182, 107, .35); }
+.ukr-hero .lbl { font: 700 11.5px Onest; color: var(--u-ink-3); text-transform: uppercase; letter-spacing: .14em; }
+.ukr-hero .uah {
+  font: 800 36px/1.15 Manrope; margin-top: 1px;
+  background: linear-gradient(110deg, #F3E9DF 30%, var(--u-gold) 70%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.ukr-hero .cities { font: 600 13.5px Onest; color: var(--u-ink-2); margin-top: 4px; }
+.ukr-hero .cities b { color: var(--u-gold); font: 800 14px Manrope; }
+.ukr-litbar { height: 4px; border-radius: 99px; background: var(--u-card-2); margin-top: 8px; overflow: hidden; }
+.ukr-litbar i { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--u-accent-deep), var(--u-gold)); box-shadow: 0 0 10px rgba(224, 182, 107, .6); transition: width .8s ease; }
+
+/* ── CTA для стрімера (верх-право) ── */
+.ukr-cta { top: 16px; right: 16px; padding: 12px 18px; z-index: 10; text-decoration: none; color: var(--u-ink-2); font: 600 13px Onest; display: flex; gap: 9px; align-items: center; transition: .15s; }
+.ukr-cta b { color: #F3E9DF; font: 700 13.5px Onest; }
+.ukr-cta .arr { color: var(--u-accent-soft); font: 800 15px Manrope; transition: translate .15s; }
+.ukr-cta:hover { border-color: var(--u-accent); }
+.ukr-cta:hover .arr { translate: 3px 0; }
+
+/* ── Топ міст (₴) ── */
+.ukr-top { left: 16px; top: 92px; width: 282px; padding: 14px 14px 10px; z-index: 9; }
+.ukr-ptitle { font: 700 13px Onest; color: var(--u-ink-3); text-transform: uppercase; letter-spacing: .08em; margin: 0 4px 10px; display: flex; justify-content: space-between; align-items: center; }
+.ukr-wtabs { display: flex; gap: 5px; margin: 0 2px 10px; }
+.ukr-wtab { flex: 1; text-align: center; font: 600 12px Onest; color: var(--u-ink-3); padding: 6px 4px; border: 1px solid var(--u-line-soft); border-radius: 999px; cursor: pointer; background: none; transition: .15s; }
+.ukr-wtab:hover { color: var(--u-ink-2); border-color: #3A2F26; }
+.ukr-wtab.on { color: #241505; background: linear-gradient(135deg, var(--u-accent), var(--u-gold)); border-color: transparent; font-weight: 800; }
+.ukr-trow { display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-radius: var(--u-radius-sm); transition: background .3s; cursor: pointer; width: 100%; border: 0; background: none; text-align: left; color: inherit; }
+.ukr-trow:hover { background: var(--u-card-2); }
+.ukr-trow .medal { width: 22px; text-align: center; font-size: 15px; flex: none; }
+.ukr-trow .nm { flex: 1; font: 600 14px Onest; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.ukr-trow .uah { font: 800 13px Manrope; color: var(--u-accent-soft); flex: none; }
+.ukr-toplist { overflow-y: auto; max-height: calc(100vh - 420px); }
+.ukr-toplist::-webkit-scrollbar { width: 8px; }
+.ukr-toplist::-webkit-scrollbar-thumb { background: #3A2F26; border-radius: 99px; }
+.ukr-empty { font: 500 13px Onest; color: var(--u-ink-3); padding: 8px 6px; }
+.ukr-hint { font: 500 12px Onest; color: var(--u-ink-3); padding: 9px 6px 4px; border-top: 1px dashed #3A2F26; margin-top: 7px; }
+.ukr-hint b { color: var(--u-accent-soft); }
+
+/* ── Права колонка: стрічка (скрол) + наживо + бренд — гнучкий стовпець, без накладань ── */
+.ukr-right { position: fixed; right: 16px; top: 80px; bottom: 16px; width: 292px; display: flex; flex-direction: column; gap: 12px; z-index: 9; }
+
+/* ── Стрічка (без текстів повідомлень) ── */
+.ukr-feed { position: static; width: auto; padding: 14px 14px 8px; flex: 1 1 auto; min-height: 88px; display: flex; flex-direction: column; }
+.ukr-feedlist { overflow-y: auto; min-height: 0; }
+.ukr-feedlist::-webkit-scrollbar { width: 8px; }
+.ukr-feedlist::-webkit-scrollbar-thumb { background: #3A2F26; border-radius: 99px; }
+.ukr-frow { display: flex; align-items: baseline; gap: 8px; padding: 7px 8px; border-radius: var(--u-radius-sm); }
+.ukr-frow .who { font: 600 13.5px Onest; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ukr-frow .cty { font: 500 12px Onest; color: var(--u-ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 38%; }
+.ukr-frow .amt { font: 800 13.5px Manrope; color: var(--u-gold); margin-left: auto; flex: none; }
+
+/* ── Зараз наживо ── */
+.ukr-livenow { position: static; width: auto; padding: 14px 14px 10px; flex: none; max-height: 240px; overflow-y: auto; }
+.ukr-lrow { display: flex; align-items: center; gap: 9px; padding: 7px 8px; border-radius: var(--u-radius-sm); }
+.ukr-lrow .ld { width: 8px; height: 8px; border-radius: 50%; background: var(--u-danger); flex: none; animation: ukr-pulse 1.6s infinite; }
+@keyframes ukr-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(224, 107, 87, .5); } 50% { box-shadow: 0 0 0 6px rgba(224, 107, 87, 0); } }
+.ukr-lrow .ln { min-width: 0; }
+.ukr-lrow .ls { font: 700 13.5px Onest; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ukr-lrow .lt { font: 500 11.5px Onest; color: var(--u-ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ukr-lrow a { margin-left: auto; flex: none; color: var(--u-accent-soft); font: 700 12.5px Onest; text-decoration: none; }
+
+/* ── Учасники (низ-ліво) ── */
+.ukr-parts { left: 16px; bottom: 16px; padding: 12px 14px 10px; z-index: 9; max-width: min(560px, calc(100vw - 600px)); }
+.ukr-partrow { display: flex; gap: 8px; flex-wrap: wrap; }
+.ukr-chip { display: flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; border: 1px solid var(--u-line-soft); border-radius: 999px; background: var(--u-card-2); text-decoration: none; transition: .15s; }
+.ukr-chip:hover { border-color: var(--u-accent); }
+.ukr-chip .cava { width: 26px; height: 26px; border-radius: 50%; background: linear-gradient(135deg, var(--u-accent), var(--u-gold)); display: grid; place-items: center; font: 800 12px Manrope; color: #241505; flex: none; }
+.ukr-chip .cn { font: 700 12.5px Onest; color: #F3E9DF; }
+.ukr-chip .cu { font: 600 11.5px Manrope; color: var(--u-ink-3); }
+.ukr-chip-more { font: 700 12px Onest; color: var(--u-ink-3); padding: 8px 14px; cursor: default; }
+
+/* ── Збір у фокусі (низ-центр) ── */
+.ukr-focus { left: 50%; transform: translateX(-50%); bottom: 16px; display: flex; align-items: center; gap: 20px; padding: 14px 20px; z-index: 10; border-color: rgba(224, 182, 107, .4); max-width: min(880px, calc(100vw - 32px)); }
+.ukr-fbadge { position: absolute; top: -10px; left: 18px; background: linear-gradient(135deg, var(--u-accent), var(--u-gold)); color: #241505; font: 800 10px Manrope; letter-spacing: .1em; text-transform: uppercase; padding: 3px 10px; border-radius: 999px; }
+.ukr-focus .goal { min-width: 290px; }
+.ukr-focus .gname { font: 800 15px Manrope; }
+.ukr-focus .gby { font: 500 12px Onest; color: var(--u-ink-3); margin: 1px 0 7px; }
+.ukr-focus .gby a { color: var(--u-accent-soft); text-decoration: none; font-weight: 700; }
+.ukr-focus .gnum { display: flex; justify-content: space-between; font: 600 12.5px Onest; color: var(--u-ink-2); margin-bottom: 6px; gap: 12px; }
+.ukr-focus .gnum b { color: #F3E9DF; font: 800 13px Manrope; white-space: nowrap; }
+.ukr-bar { height: 10px; border-radius: 999px; background: var(--u-card-2); overflow: hidden; }
+.ukr-bar i { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--u-accent-deep), var(--u-gold)); transition: width .8s ease; }
+.ukr-btn-don {
+  display: inline-block; padding: 13px 22px; border-radius: 999px; text-decoration: none;
+  background: linear-gradient(135deg, var(--u-accent), var(--u-gold)); color: #241505;
+  font: 800 15px Manrope; box-shadow: 0 10px 30px rgba(208, 135, 90, .35); transition: .15s; white-space: nowrap;
+}
+.ukr-btn-don:hover { transform: translateY(-2px); }
+.ukr-qr { width: 64px; height: 64px; border-radius: 10px; background: #F3E9DF; padding: 5px; flex: none; }
+.ukr-qr svg { width: 100%; height: 100%; display: block; }
+.ukr-fhint { font: 500 11.5px Onest; color: var(--u-ink-3); max-width: 130px; line-height: 1.45; }
+.ukr-fhint b { color: var(--u-ink-2); }
+
+/* ── Картка міста ── */
+.ukr-citycard { right: 16px; bottom: 16px; width: 300px; padding: 16px; z-index: 12; animation: ukr-slidein .35s ease; }
+@keyframes ukr-slidein { from { opacity: 0; translate: 24px 0; } to { opacity: 1; translate: 0 0; } }
+.ukr-citycard h3 { margin: 0 0 1px; font: 800 18px Manrope; overflow-wrap: anywhere; padding-right: 18px; }
+.ukr-citycard .obl { font: 600 12px Onest; color: var(--u-ink-3); margin-bottom: 8px; }
+.ukr-citycard .csum { font: 800 22px Manrope; color: var(--u-gold); margin-bottom: 10px; }
+.ukr-citycard .csum small { font: 600 12px Onest; color: var(--u-ink-3); }
+.ukr-citycard .sec { font: 700 11px Onest; color: var(--u-ink-3); text-transform: uppercase; letter-spacing: .08em; margin: 10px 0 4px; }
+.ukr-citycard .brow { display: flex; gap: 8px; font: 500 12.5px Onest; color: var(--u-ink-2); padding: 3px 0; }
+.ukr-citycard .brow a { color: var(--u-accent-soft); font-weight: 700; text-decoration: none; }
+.ukr-citycard .brow .a { margin-left: auto; color: #F3E9DF; font: 700 12.5px Manrope; }
+.ukr-citycard .cdon { display: flex; gap: 8px; font: 500 12.5px Onest; color: var(--u-ink-2); padding: 3px 0; }
+.ukr-citycard .cdon .a { margin-left: auto; color: var(--u-gold); font: 700 12.5px Manrope; }
+.ukr-citycard .x { position: absolute; top: 10px; right: 14px; background: none; border: 0; color: var(--u-ink-3); cursor: pointer; font-size: 16px; }
+
+/* ── Футер-бренд (у низу правої колонки) ── */
+.ukr-brandfoot { flex: none; font: 600 11.5px Onest; color: var(--u-ink-3); text-align: right; padding: 0 4px; }
+.ukr-brandfoot a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+
+@media (max-width: 1280px) { .ukr-parts { max-width: calc(100vw - 640px); } }
+@media (max-width: 1080px) { .ukr-livenow { display: none; } }
+@media (max-width: 980px) {
+  .ukr-root { position: static; overflow: visible; min-height: 100vh; }
+  .ukr-map { position: relative; height: 55vh; inset: auto; }
+  .ukr-panel { position: relative; inset: auto; left: auto; right: auto; top: auto; bottom: auto; transform: none; width: auto; max-width: none; margin: 12px; }
+  .ukr-right { position: static; width: auto; display: contents; }
+  .ukr-feedlist { max-height: none; }
+  .ukr-livenow { max-height: none; }
+  .ukr-hero { transform: none; }
+  .ukr-focus { transform: none; flex-wrap: wrap; }
+  .ukr-cta, .ukr-brandfoot { display: none; }
+  .ukr-hero .uah { font-size: 28px; }
+}

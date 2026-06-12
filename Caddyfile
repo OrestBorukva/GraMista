@@ -1,0 +1,18 @@
+# Reverse-proxy GraMista: автоматичний Let's Encrypt. Домен і пошта — з env
+# (серверний /opt/gramista/.env → environment сервісу caddy в compose).
+# flush_interval -1 — віддавати SSE-події миттєво, без буферизації.
+{
+	email {$CADDY_EMAIL}
+}
+
+{$CADDY_DOMAIN} {
+	encode gzip
+	# Найбільші легітимні тіла — форми панелі (server actions, ліміт Next 1 МБ);
+	# без межі гігантський POST (напр. у відкритий вебхук) міг би з'їсти пам'ять.
+	request_body {
+		max_size 1MB
+	}
+	reverse_proxy web:3000 {
+		flush_interval -1
+	}
+}

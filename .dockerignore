@@ -1,0 +1,18 @@
+# Не тягнемо в образ Windows-залежності та артефакти — node_modules ставимо в контейнері (Linux).
+node_modules
+.next
+.git
+dist
+build
+data
+*.tsbuildinfo
+*.log
+.env
+.superpowers
+.playwright-mcp
+.idea
+.vscode
+*.png
+docs
+PLAN.md
+CLAUDE.md

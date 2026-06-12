@@ -1,0 +1,168 @@
+/* Стилі віджетів OBS. Прозорий фон для Browser Source. Токени теплої теми — з globals.css
+   (кореневий layout вантажить його на всіх маршрутах), тож тут лише власні класи віджетів. */
+
+html, body { background: transparent !important; margin: 0; }
+
+.ov-root {
+  position: relative;
+  min-height: 100vh;
+  padding: 16px;
+  display: flex;
+  align-items: flex-start;
+  color: var(--ink);
+  font-family: "Onest", "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ───── Спільна підкладка оверлея + 3 стилі ───── */
+.ov { border-radius: var(--radius); color: var(--ink); }
+.ov, .ov * { box-sizing: border-box; }
+
+/* A: «Скло» (затверджений) */
+.st-glass .ov {
+  background: rgba(27, 23, 20, .56);
+  border: 1px solid rgba(243, 233, 223, .10);
+  backdrop-filter: blur(13px) saturate(115%);
+  -webkit-backdrop-filter: blur(13px) saturate(115%);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, .5), inset 0 1px 0 rgba(255, 255, 255, .06);
+}
+.st-glass .ov, .st-glass .ov * { text-shadow: 0 1px 3px rgba(0, 0, 0, .55); }
+
+/* B: «Щільне» (суцільний, без блюру — найчіткіше) */
+.st-solid .ov {
+  background: linear-gradient(180deg, rgba(31, 25, 21, .94), rgba(24, 19, 16, .96));
+  border: 1px solid var(--line);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, .55);
+}
+.st-solid .ov, .st-solid .ov * { text-shadow: none; }
+
+/* C: «Мінімал» (майже без підкладки, текст з обводкою) */
+.st-minimal .ov {
+  background: linear-gradient(90deg, rgba(20, 16, 12, .42), rgba(20, 16, 12, .14) 88%, transparent);
+  border: 0;
+  border-left: 2px solid rgba(226, 168, 120, .55);
+  border-radius: 4px;
+}
+.st-minimal .ov, .st-minimal .ov * { text-shadow: 0 2px 6px rgba(0, 0, 0, .85), 0 0 2px rgba(0, 0, 0, .9); }
+
+.ov-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 11px; }
+.ov-title { font-family: "Manrope", sans-serif; font-weight: 800; font-size: 17px; display: flex; align-items: center; gap: 8px; }
+.ov-hint { font-size: 10.5px; color: var(--ink-2); font-weight: 600; }
+
+/* ───── Топ міст ───── */
+.ov-top { width: 320px; padding: 14px 14px 12px; }
+.toplist { display: flex; flex-direction: column; gap: 5px; }
+.trow { display: flex; align-items: center; gap: 11px; padding: 7px 9px; border-radius: var(--radius-sm); }
+.rank {
+  flex: none; width: 28px; height: 28px; border-radius: 9px; display: grid; place-items: center;
+  font-family: "Manrope", sans-serif; font-weight: 800; font-size: 14px; color: var(--ink-2);
+  background: rgba(33, 27, 22, .7); font-variant-numeric: tabular-nums;
+}
+.tcity { flex: none; width: 96px; font-weight: 600; font-size: 16px; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tbar { flex: 1; height: 7px; border-radius: 99px; background: rgba(255, 255, 255, .07); overflow: hidden; }
+.tbar i { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--accent-deep), var(--accent-soft)); transition: width .6s ease; }
+.tpts { flex: none; width: 64px; text-align: right; font-family: "Manrope", sans-serif; font-variant-numeric: tabular-nums; font-weight: 800; font-size: 16px; color: var(--ink); }
+.tpts em { font-style: normal; font-weight: 600; font-size: 10.5px; color: var(--ink-2); margin-left: 3px; }
+.trow.medal { background: linear-gradient(100deg, rgba(208, 135, 90, .10), transparent 72%); }
+.st-minimal .trow.medal { background: linear-gradient(100deg, rgba(208, 135, 90, .16), transparent 72%); }
+.trow.medal .rank { color: #1B1714; }
+.trow.r1 .rank { background: linear-gradient(150deg, #EBCB82, var(--gold)); box-shadow: 0 0 0 1px rgba(224, 182, 107, .5), 0 0 14px rgba(224, 182, 107, .55); animation: ov-glow 2.6s ease-in-out infinite; }
+.trow.r2 .rank { background: linear-gradient(150deg, #DBCCBC, var(--silver)); }
+.trow.r3 .rank { background: linear-gradient(150deg, #D49D70, var(--bronze)); }
+.trow.r1 .tpts { color: var(--gold); }
+.trow.r1 .tcity { color: #FBEFD9; }
+.trow.r1 .tbar i { background: linear-gradient(90deg, var(--gold), #F4DDA0); }
+@keyframes ov-glow {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(224, 182, 107, .5), 0 0 12px rgba(224, 182, 107, .45); }
+  50% { box-shadow: 0 0 0 1px rgba(224, 182, 107, .7), 0 0 22px rgba(224, 182, 107, .75); }
+}
+
+/* ───── Зібрано / лічильник ───── */
+.ov-total { padding: 10px 18px; display: inline-flex; flex-direction: column; gap: 2px; }
+.ov-total .lbl { font-size: 12px; color: var(--ink-2); font-weight: 600; }
+.ov-total .val { font-family: "Manrope", sans-serif; font-weight: 800; font-size: 30px; color: var(--accent-soft); font-variant-numeric: tabular-nums; }
+
+/* ───── Таймер ───── */
+.ov-timer { padding: 10px 18px; display: inline-flex; flex-direction: column; gap: 2px; }
+.ov-timer .timer-val { font-family: "Manrope", sans-serif; font-weight: 800; font-size: 40px; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+/* ───── Донат-алерт (картка) ───── */
+.ov-alert { position: relative; width: 380px; padding: 14px 16px; display: flex; align-items: center; gap: 14px; }
+.st-glass .ov-alert { border-color: rgba(226, 168, 120, .28); box-shadow: 0 16px 44px rgba(0, 0, 0, .55), 0 0 0 1px rgba(226, 168, 120, .12), 0 0 28px rgba(208, 135, 90, .22); }
+.ov-alert.show { animation: ov-pop 5.2s ease forwards; }
+.ov-alert .ov-ncty {
+  position: absolute; top: -11px; left: 14px; font-weight: 800; font-size: 11px; color: #241E19;
+  background: linear-gradient(180deg, #E0B66B, #D0875A); border-radius: 999px; padding: 3px 10px;
+  white-space: nowrap;
+}
+@keyframes ov-pop {
+  0% { transform: translateY(16px) scale(.97); opacity: 0; }
+  6% { transform: translateY(0) scale(1); opacity: 1; }
+  88% { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(10px) scale(.99); opacity: 0; }
+}
+.avatar { flex: none; width: 52px; height: 52px; border-radius: 12px; display: grid; place-items: center; font-family: "Manrope", sans-serif; font-weight: 800; font-size: 22px; color: #241E19; background: linear-gradient(150deg, var(--accent-soft), var(--accent-deep)); box-shadow: 0 6px 16px rgba(182, 110, 67, .4), inset 0 1px 0 rgba(255, 255, 255, .3); text-shadow: none !important; }
+.avatar.muted { background: rgba(154, 137, 121, .5); color: var(--ink); }
+.d-body { flex: 1; min-width: 0; }
+.d-top { display: flex; align-items: baseline; gap: 10px; }
+.d-name { font-weight: 600; font-size: 17px; color: var(--ink); }
+.d-sum { margin-left: auto; font-family: "Manrope", sans-serif; font-weight: 800; font-size: 22px; color: var(--accent-soft); font-variant-numeric: tabular-nums; }
+.d-meta { display: flex; align-items: center; gap: 8px; margin-top: 6px; font-size: 14px; color: var(--ink-2); flex-wrap: wrap; }
+.d-meta .place { color: var(--ink); font-weight: 600; }
+.badge { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; font-weight: 700; padding: 3px 11px; border-radius: 999px; color: var(--accent-soft); background: rgba(208, 135, 90, .16); border: 1px solid rgba(226, 168, 120, .22); text-shadow: none !important; }
+.badge.pot { color: var(--pot); background: rgba(140, 154, 107, .16); border-color: rgba(140, 154, 107, .3); }
+.badge.none { color: var(--ink-3); background: rgba(154, 137, 121, .14); border-color: rgba(154, 137, 121, .25); }
+
+/* ───── Стрічка (список) ───── */
+.ov-list { width: 340px; padding: 12px 12px; display: flex; flex-direction: column; gap: 8px; }
+.ov-list .ov-title { font-size: 14px; }
+.li { display: flex; align-items: center; gap: 10px; padding: 8px 9px; border-radius: var(--radius-sm); background: rgba(255, 255, 255, .04); animation: ov-lin .5s ease; }
+.st-solid .li { background: rgba(255, 255, 255, .05); }
+.st-minimal .li { background: transparent; border-left: 2px solid rgba(226, 168, 120, .35); }
+@keyframes ov-lin { 0% { opacity: 0; transform: translateY(-8px); } 100% { opacity: 1; } }
+.li .av { flex: none; width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center; font-weight: 800; font-size: 15px; color: #241E19; background: linear-gradient(150deg, var(--accent-soft), var(--accent-deep)); text-shadow: none !important; }
+.li .av.muted { background: rgba(154, 137, 121, .45); color: var(--ink); }
+.li .lb { flex: 1; min-width: 0; }
+.li .l-top { display: flex; align-items: baseline; gap: 8px; }
+.li .l-name { font-weight: 600; font-size: 14px; }
+.li .l-sum { margin-left: auto; font-family: "Manrope", sans-serif; font-weight: 800; font-size: 15px; color: var(--accent-soft); }
+.li .l-meta { font-size: 11.5px; color: var(--ink-2); margin-top: 1px; }
+.li .l-meta b { color: var(--ink); font-weight: 600; }
+.ov-list .l-ncty {
+  margin-left: 6px; font-weight: 800; font-size: 10px; color: #241E19;
+  background: linear-gradient(180deg, var(--gold, #E0B66B), #D0875A); border-radius: 999px; padding: 1px 7px;
+}
+
+/* ───── Прогрес збору ───── */
+.ov-goal { padding: 14px 16px; min-width: 320px; display: inline-flex; flex-direction: column; gap: 6px; }
+.ov-goal .ov-title { font-size: 15px; }
+.ov-goal .goal-bar { height: 12px; border-radius: 99px; background: rgba(255, 255, 255, .08); overflow: hidden; margin: 8px 0; }
+.ov-goal .goal-bar i { display: block; height: 100%; border-radius: 99px;
+  background: linear-gradient(90deg, var(--accent-deep), var(--accent-soft)); transition: width .6s ease; }
+.ov-goal .goal-val { font-family: "Manrope", sans-serif; font-weight: 700; font-size: 16px; color: var(--ink); font-variant-numeric: tabular-nums; }
+.ov-goal .goal-val b { color: var(--accent-soft); }
+.ov-goal .goal-pct { color: var(--accent-soft); margin-left: 6px; }
+
+/* ───── Мапа (повноекранна сцена) ───── */
+.ov-map-canvas { position: fixed; inset: 0; }
+.ov-map-canvas .map-canvas { height: 100vh; }
+
+/* ───── Коментар донату (вмикається в конструкторі: comment=1) ───── */
+.ov-list .l-msg {
+  font-size: 12px;
+  color: var(--ink-2);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ov-alert .d-msg {
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+
+/* Помилка нерозпізнаної силки оверлея (невідомий ?k=). */
+.ov-empty { padding: 16px; color: #aaa; font: 14px system-ui; }
